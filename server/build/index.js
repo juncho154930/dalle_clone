@@ -38,15 +38,27 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const dotenv = __importStar(require("dotenv"));
 const cors_1 = __importDefault(require("cors"));
+const connect_1 = __importDefault(require("./mongodb/connect"));
+const postRoutes_1 = __importDefault(require("./routes/postRoutes"));
+const dalleRoutes_1 = __importDefault(require("./routes/dalleRoutes"));
 dotenv.config();
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)());
 app.use(express_1.default.json({ limit: '50mb' }));
+app.use('/api/v1/posts', postRoutes_1.default);
+app.use('/api/v1/dalle', dalleRoutes_1.default);
 app.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.send('Hello from DALL-E!');
 }));
 const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
-    app.listen(process.env.PORT, () => {
-        console.log(`Server is running on port ${process.env.PORT}`);
-    });
+    try {
+        (0, connect_1.default)(process.env.MONGODB_URL);
+        app.listen(8080, () => {
+            console.log(`Server is running on port 8080`);
+        });
+    }
+    catch (error) {
+        console.log(error);
+    }
 });
+startServer();
