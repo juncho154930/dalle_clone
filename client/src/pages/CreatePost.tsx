@@ -15,12 +15,55 @@ const CreatePost = () => {
   const [generatingImg, setGeneratingImg] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  const generateImage = () => {
-    
+  const generateImage = async () => {
+    if(form.prompt) {
+      try {
+        setGeneratingImg(true)
+        const response = await fetch('http://localhost:8080/api/v1/dalle', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ prompt: form.prompt })
+        })
+
+        const data = await response.json()
+        setForm({ ...form, photo: `data:image/jpeg;base64,${data.photo}` })
+      } catch (error) {
+        console.log(error)
+      } finally {
+        setGeneratingImg(false)
+      }
+    } else {
+      alert("Please enter a prompt")
+    }
   }
   
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
 
+    if(form.prompt && form.photo) {
+      setLoading(true)
+
+      try {
+        const response = await fetch('http://localhost:8080/api/v1/posts', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(form)
+        })
+
+        await response.json()
+        navigate('/')
+      } catch (error) {
+        alert(error)
+      } finally {  
+        setLoading(false)
+      }
+    } else {
+      alert("Please enter a prompt and generate an image")
+    }
   }
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -107,6 +150,16 @@ const CreatePost = () => {
           </button>
         </div>
       </form>
+
+      <div>
+        <p className='mt-2 text-[#666e75] text-[16px] max-w-[500px]'>
+          If image generation isnt working it is probably because it hit one of these limits:
+        </p>
+        <ul className='mt-2 text-[#666e75] text-[16px] max-w-[500px]'>
+          <li>OpenAI: $5.00 Credit expires on July 1, 2023</li>
+          <li>Cloudinary 25 Credits</li>
+        </ul>
+      </div>
     </section>
   )
 }
