@@ -15,7 +15,9 @@ const CreatePost = () => {
   const [generatingImg, setGeneratingImg] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  const generateImage = async () => {
+  const generateImage = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+
     if(form.prompt) {
       try {
         setGeneratingImg(true)
@@ -39,9 +41,7 @@ const CreatePost = () => {
     }
   }
   
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-
+  const handleSubmit = async () => {
     if(form.prompt && form.photo) {
       setLoading(true)
 
@@ -84,7 +84,7 @@ const CreatePost = () => {
         </p>
       </div>
 
-      <form className="mt-16 max-w-3xl" onSubmit={handleSubmit}>
+      <form className="mt-16 max-w-3xl" onSubmit={generateImage}>
         <div className="flex flex-col gap-5">
           <FormField
             labelName="Your name"
@@ -130,8 +130,7 @@ const CreatePost = () => {
 
         <div className="mt-5 flex gap-5">
           <button 
-            type="button"
-            onClick={generateImage}
+            type="submit"
             className="text-white bg-green-700 font-medium rounded-md text-sm w-full sm:w-auto px-5 py-2.5 text-center"
           >
             {generatingImg ? 'Generating...' : 'Generate'}
@@ -143,7 +142,8 @@ const CreatePost = () => {
             Once you have created the image you want, you can share it with others in the community
           </p>
           <button
-            type="submit"
+            type="button"
+            onClick={handleSubmit}
             className="mt-3 text-white bg-[#6469ff] font-medium rounded-md text-sm w-full sm:w-auto px-5 py-2.5 text-center"
           >
             {loading ? 'Sharing...' : 'Share with the community'}
